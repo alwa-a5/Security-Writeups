@@ -23,7 +23,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q1: What is the size of the malicious file?
 
-The supplied MD5 hash can be used as a unique identifier for the malicious sample. A lookup in Kaspersky's threat intelligence portal matches it to a malicious 32-bit Windows DLL. The metadata page lists the exact file size as 921.36 KB.
+I used the supplied MD5 hash to search for the sample in Kaspersky's Threat Intelligence Portal. The lookup matched the hash to a malicious 32-bit Windows DLL and displayed its file metadata. The size field showed that the file was 921.36 KB.
 
 **Answer:** `921.36 KB`
 
@@ -31,7 +31,7 @@ The supplied MD5 hash can be used as a unique identifier for the malicious sampl
 
 ### Q2: What word did the threat actor use for victims?
 
-The campaign report explains the language used by the operators in their log messages. They referred to victims using a term from Russian cybercriminal slang that compares them to animals hunted for valuable tusks. This language also explains the name given to the Tusk campaign.
+I used the sample's hash and campaign details to locate the related Securelist report. The report explained that the operators called their victims “Mammoths,” a term from Russian cybercriminal slang that compares victims to animals hunted for valuable tusks. This made `Mammoth` the answer.
 
 **Answer:** `Mammoth`
 
@@ -39,7 +39,7 @@ The campaign report explains the language used by the operators in their log mes
 
 ### Q3: What malicious website copied peerme.io?
 
-The legitimate service in this part of the campaign was `peerme.io`, a platform used to manage DAOs. The report shows a copied website with similar branding and a download button that delivered malware instead of the real application. The domain connected to that copied site was `tidyme.io`.
+I used the campaign report to compare the real PeerMe platform with the attacker's copied website. The fake site reused the DAO theme and included a download button that delivered malware instead of the legitimate application. The domain listed for that malicious copy was `tidyme.io`.
 
 **Answer:** `tidyme.io`
 
@@ -47,7 +47,7 @@ The legitimate service in this part of the campaign was `peerme.io`, a platform 
 
 ### Q4: Which cloud storage service hosted the malware?
 
-The campaign offered downloads for both Windows and macOS victims. Reviewing the download links shows that the payloads for both operating systems were stored on the same cloud storage service. Those links point to Dropbox.
+I used the documented download links to compare the Windows and macOS versions of the malware. Both links pointed to files hosted on the same cloud storage platform. The URLs showed that the campaign operators used Dropbox.
 
 **Answer:** `Dropbox`
 
@@ -55,7 +55,7 @@ The campaign offered downloads for both Windows and macOS victims. Reviewing the
 
 ### Q5: What was the archive decompression password?
 
-The malware's `config.json` file contains encoded download locations and a separate value used during archive extraction. The downloader passes that hardcoded value to the decompression routine after retrieving the second-stage payload. The value stored in the configuration is the archive password.
+I used the `config.json` data to find the value passed to the archive-extraction routine. The configuration contained encoded payload URLs and a hardcoded decompression password. The password stored in that field was `newfile2024`.
 
 **Answer:** `newfile2024`
 
@@ -63,7 +63,7 @@ The malware's `config.json` file contains encoded download locations and a separ
 
 ### Q6: Which function retrieves the archive field?
 
-The `preload.js` script contains the logic used to process the archive field from the configuration. One function reads and decodes the archive URL, downloads the protected file, extracts it with the configured password, and runs the included executables. The function name describes this complete process.
+I used `preload.js` to trace the function that referenced the `archive` field from `config.json`. The same function decoded the URL, downloaded the archive, extracted it with the configured password, and ran its executable files. Its name was `downloadAndExtractArchive`.
 
 **Answer:** `downloadAndExtractArchive`
 
@@ -71,7 +71,7 @@ The `preload.js` script contains the logic used to process the archive field fro
 
 ### Q7: What were the legitimate and malicious AI translators?
 
-The third sub-campaign copied an existing AI translation service to make the malicious download appear trustworthy. Campaign research identifies YOUS.AI as the legitimate translator and shows that the attackers used `voico.io` for the imitation. The fake site distributed a malicious downloader while copying the idea and appearance of the real service.
+I used the third sub-campaign section of the threat report to compare the legitimate AI translator with the attacker's copy. The report named YOUS.AI as the real service and showed that `voico.io` copied it to distribute a malicious downloader. This provided both the legitimate and malicious translator names.
 
 **Answer:** Legitimate: `YOUS.AI` | Malicious: `voico.io`
 
@@ -79,7 +79,7 @@ The third sub-campaign copied an existing AI translation service to make the mal
 
 ### Q8: What were the StealC C2 server IP addresses?
 
-The campaign's network indicators separate the infrastructure used by the different malware families. Two IP addresses are specifically connected to StealC command-and-control activity. These servers allowed infected systems to send stolen information and receive further instructions.
+I used the network-indicator section of the campaign report to find the entries labeled as StealC command-and-control infrastructure. Two IP addresses were linked to communications between StealC infections and the attacker's servers. Those addresses were `46.8.238.240` and `23.94.225.177`.
 
 **Answer:** `46.8.238.240` and `23.94.225.177`
 
@@ -87,7 +87,7 @@ The campaign's network indicators separate the infrastructure used by the differ
 
 ### Q9: What Ethereum wallet was used in the campaign?
 
-The campaign included clipper malware that watched the clipboard for copied cryptocurrency addresses. When an Ethereum address was detected, the malware replaced it with an address controlled by the attacker. The replacement value found in the campaign data is the Ethereum wallet used by the operators.
+I used the clipper configuration to find the Ethereum address stored as the clipboard replacement value. The malware monitored copied cryptocurrency addresses and replaced matching Ethereum addresses with the attacker's wallet. The configured replacement address was `0xaf0362e215Ff4e004F30e785e822F7E20b99723A`.
 
 **Answer:** `0xaf0362e215Ff4e004F30e785e822F7E20b99723A`
 
