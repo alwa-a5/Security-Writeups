@@ -42,7 +42,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q1: Which wallet is used to ask for the seed phrase?
 
-**Thinking process:** The kit contains a MetaMask page with a field asking for an account recovery phrase. This identifies the wallet being targeted.
+The kit contains a directory and recovery page built around MetaMask. The form asks the victim for an account recovery phrase, which is the seed phrase used to restore a MetaMask wallet. These details identify MetaMask as the wallet being targeted.
 
 **Answer:** `MetaMask`
 
@@ -52,7 +52,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q2: Which file contains the phishing kit code?
 
-**Thinking process:** The `metamask.php` file handles the submitted form data and contains the main phishing logic.
+The file list shows a server-side file named `metamask.php`. Reviewing its contents shows that it receives the submitted recovery phrase, formats the stolen information, and handles the logging and exfiltration steps. This makes it the main file responsible for the phishing kit's operation.
 
 **Answer:** `metamask.php`
 
@@ -60,7 +60,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q3: Which language was the kit written in?
 
-**Thinking process:** The `.php` file extension and server-side syntax identify the language used by the kit.
+The main phishing file uses the `.php` extension and contains PHP server-side syntax. Its code processes form input, works with variables, and sends information after the victim submits the page. These features confirm the language used by the kit.
 
 **Answer:** `PHP`
 
@@ -68,7 +68,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q4: Which service retrieves the victim's machine information?
 
-**Thinking process:** The script sends the victim's IP address to a Sypex Geo endpoint and reads the returned country, region, and city information.
+The script collects the victim's IP address and sends it to a Sypex Geo endpoint. It then reads location fields such as the country, region, and city from the response. This shows that Sypex Geo is the service used to gather information about the victim's system and location.
 
 **Answer:** `Sypex Geo`
 
@@ -76,7 +76,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q5: How many seed phrases had already been collected?
 
-**Thinking process:** The `log.txt` file contains three separate seed phrase entries, so three phrases had already been collected.
+The `log.txt` file stores each captured seed phrase as a separate entry. Counting the distinct entries in the file gives a total of three. This means the phishing kit had already collected three seed phrases when the files were examined.
 
 **Answer:** `3`
 
@@ -84,7 +84,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q6: What was the most recent seed phrase?
 
-**Thinking process:** The entries in `log.txt` are listed in order, making the last entry the most recent one.
+The phishing script adds newly captured information to `log.txt` instead of replacing the earlier entries. Because the records are appended in order, the entry at the bottom of the file represents the latest phishing incident. The written answer is shortened because it contains wallet recovery information.
 
 **Answer:** `father also ... hockey` *(redacted in the written answer)*
 
@@ -92,7 +92,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q7: Which methods were used for credential dumping?
 
-**Thinking process:** The code writes the stolen data to `log.txt` and also sends it through the Telegram API. These are the two credential-dumping methods.
+The script uses two separate methods to keep the stolen information. One section writes the captured data to the local `log.txt` file, while another sends the same data through the Telegram API. Local storage provides a backup, and Telegram gives the attacker near real-time access to new submissions.
 
 **Answer:** Local logging in `log.txt` and exfiltration through `Telegram`
 
@@ -100,7 +100,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q8: What is the Telegram bot token?
 
-**Thinking process:** The value assigned to the bot-token variable is used in the Telegram API request, identifying the channel token.
+The PHP code builds a Telegram API request using a hardcoded bot token. The token appears in the request path before the Telegram method name, which allows the bot to authenticate with the service. The written value is partially masked because it has the format of an active credential.
 
 **Answer:** `5457463144:...xm10` *(redacted in the written answer)*
 
@@ -108,7 +108,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q9: What is the phisher's Telegram chat ID?
 
-**Thinking process:** The chat ID is passed with the Telegram request to select the destination for the stolen information.
+The Telegram request contains a `chat_id` parameter along with the stolen message. This value tells the bot which user, group, or channel should receive the information. The number assigned to that parameter is therefore the phisher's chat ID.
 
 **Answer:** `5442785564`
 
@@ -116,7 +116,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q10: What is the phishing kit developer's alias?
 
-**Thinking process:** The source code includes a developer handle, which identifies the alias connected to the kit.
+The source code contains a handle that is separate from the normal variables and phishing functions. Its placement looks like a developer signature or attribution left inside the kit. That handle identifies the alias associated with the phishing kit developer.
 
 **Answer:** `j1j1b1s@m3r0`
 
