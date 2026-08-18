@@ -4,14 +4,6 @@
 
 This CyberDefenders lab focuses on a 2 GB Windows memory dump captured after suspicious activity on an internal workstation. Volatility 3 reveals the malicious process, its parent, its command line, and its connection to the StrelaStealer malware family.
 
-## Challenge Details
-
-| Field | Details |
-|---|---|
-| Platform | CyberDefenders |
-| Category | Memory Forensics and Incident Response |
-| Status | Completed |
-| Lab | [Reveal](https://cyberdefenders.org/blueteam-ctf-challenges/reveal/) |
 
 ## Tools Used
 
