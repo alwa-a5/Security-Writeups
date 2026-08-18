@@ -42,7 +42,7 @@ The `grep` results highlight useful strings related to wallet names, logging, an
 
 ### Q1: Which wallet is used to ask for the seed phrase?
 
-The kit contains a directory and recovery page built around MetaMask. The form asks the victim for an account recovery phrase, which is the seed phrase used to restore a MetaMask wallet. These details identify MetaMask as the wallet being targeted.
+I used the `find` and `grep` commands to search the kit for wallet names and seed-phrase fields. The results showed a MetaMask directory and a recovery form asking the victim for an account secret phrase. Since that phrase is used to restore a MetaMask wallet, the targeted wallet was MetaMask.
 
 **Answer:** `MetaMask`
 
@@ -52,7 +52,7 @@ The kit contains a directory and recovery page built around MetaMask. The form a
 
 ### Q2: Which file contains the phishing kit code?
 
-The file list shows a server-side file named `metamask.php`. Reviewing its contents shows that it receives the submitted recovery phrase, formats the stolen information, and handles the logging and exfiltration steps. This makes it the main file responsible for the phishing kit's operation.
+I used `find . -type f` to list every file in the extracted kit, then used `grep` to locate the code that processed the submitted recovery phrase. The results led to `metamask.php`, which receives the form data and contains the logging and Telegram exfiltration logic. This showed that `metamask.php` was the main phishing file.
 
 **Answer:** `metamask.php`
 
@@ -60,7 +60,7 @@ The file list shows a server-side file named `metamask.php`. Reviewing its conte
 
 ### Q3: Which language was the kit written in?
 
-The main phishing file uses the `.php` extension and contains PHP server-side syntax. Its code processes form input, works with variables, and sends information after the victim submits the page. These features confirm the language used by the kit.
+I used the `cat` command to review `metamask.php` and check its file extension and server-side syntax. The code uses PHP variables and functions to process form input and send the captured information. This confirmed that the phishing kit was written in PHP.
 
 **Answer:** `PHP`
 
@@ -68,7 +68,7 @@ The main phishing file uses the `.php` extension and contains PHP server-side sy
 
 ### Q4: Which service retrieves the victim's machine information?
 
-The script collects the victim's IP address and sends it to a Sypex Geo endpoint. It then reads location fields such as the country, region, and city from the response. This shows that Sypex Geo is the service used to gather information about the victim's system and location.
+I used `grep` to search the PHP code for URLs and functions related to IP addresses and geolocation. The result showed a request to a Sypex Geo endpoint, followed by code that read the victim's country, region, and city from the response. This identified Sypex Geo as the service used to collect the victim's machine and location information.
 
 **Answer:** `Sypex Geo`
 
@@ -76,7 +76,7 @@ The script collects the victim's IP address and sends it to a Sypex Geo endpoint
 
 ### Q5: How many seed phrases had already been collected?
 
-The `log.txt` file stores each captured seed phrase as a separate entry. Counting the distinct entries in the file gives a total of three. This means the phishing kit had already collected three seed phrases when the files were examined.
+I used `cat log.txt` to display the information already stored by the phishing kit. The output contained three separate seed-phrase records. After counting those records, the answer was three collected seed phrases.
 
 **Answer:** `3`
 
@@ -84,7 +84,7 @@ The `log.txt` file stores each captured seed phrase as a separate entry. Countin
 
 ### Q6: What was the most recent seed phrase?
 
-The phishing script adds newly captured information to `log.txt` instead of replacing the earlier entries. Because the records are appended in order, the entry at the bottom of the file represents the latest phishing incident. The written answer is shortened because it contains wallet recovery information.
+I used `cat log.txt` to review the captured phrases in the order they were stored. The script appends new records to the bottom of the file, so the last entry represents the most recent phishing incident. That final entry provided the answer, but the written value is shortened because it contains wallet recovery information.
 
 **Answer:** `father also ... hockey` *(redacted in the written answer)*
 
@@ -92,7 +92,7 @@ The phishing script adds newly captured information to `log.txt` instead of repl
 
 ### Q7: Which methods were used for credential dumping?
 
-The script uses two separate methods to keep the stolen information. One section writes the captured data to the local `log.txt` file, while another sends the same data through the Telegram API. Local storage provides a backup, and Telegram gives the attacker near real-time access to new submissions.
+I used `grep` to search the PHP file for `log.txt` and Telegram-related strings. One part of the code writes the stolen information to the local log file, while another sends it through the Telegram API. This showed that the kit used local logging and Telegram as its two credential-dumping methods.
 
 **Answer:** Local logging in `log.txt` and exfiltration through `Telegram`
 
@@ -100,7 +100,7 @@ The script uses two separate methods to keep the stolen information. One section
 
 ### Q8: What is the Telegram bot token?
 
-The PHP code builds a Telegram API request using a hardcoded bot token. The token appears in the request path before the Telegram method name, which allows the bot to authenticate with the service. The written value is partially masked because it has the format of an active credential.
+I used `grep` to locate the Telegram API request inside the PHP script. The request contained a hardcoded value in the bot URL before the Telegram method name, showing that it was the bot token used for authentication. The written token is partially masked because it has the format of an active credential.
 
 **Answer:** `5457463144:...xm10` *(redacted in the written answer)*
 
@@ -108,7 +108,7 @@ The PHP code builds a Telegram API request using a hardcoded bot token. The toke
 
 ### Q9: What is the phisher's Telegram chat ID?
 
-The Telegram request contains a `chat_id` parameter along with the stolen message. This value tells the bot which user, group, or channel should receive the information. The number assigned to that parameter is therefore the phisher's chat ID.
+I used `grep` to search the Telegram request for the `chat_id` parameter. The value assigned to that parameter tells the bot where to deliver the stolen information. The number found beside `chat_id` was the phisher's Telegram chat ID.
 
 **Answer:** `5442785564`
 
@@ -116,7 +116,7 @@ The Telegram request contains a `chat_id` parameter along with the stolen messag
 
 ### Q10: What is the phishing kit developer's alias?
 
-The source code contains a handle that is separate from the normal variables and phishing functions. Its placement looks like a developer signature or attribution left inside the kit. That handle identifies the alias associated with the phishing kit developer.
+I used `grep` to search the source code for comments, signatures, and unusual usernames that were not part of the normal PHP functions. The result showed the handle `j1j1b1s@m3r0` left inside the kit as a developer signature. This identified the alias connected to the phishing kit developer.
 
 **Answer:** `j1j1b1s@m3r0`
 
