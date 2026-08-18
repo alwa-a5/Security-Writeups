@@ -4,14 +4,6 @@
 
 This CyberDefenders lab focuses on a phishing kit made to steal MetaMask seed phrases. The files reveal the phishing code, the information collected from victims, and the methods used to store and exfiltrate it.
 
-## Challenge Details
-
-| Field | Details |
-|---|---|
-| Platform | CyberDefenders |
-| Category | Phishing Analysis |
-| Status | Completed |
-| Lab | [GrabThePhisher](https://cyberdefenders.org/blueteam-ctf-challenges/grabthephisher/) |
 
 ## Tools Used
 
