@@ -1,58 +1,136 @@
+# GrabThePhisher Walkthrough
 
+## Overview
 
-setting up enviroment getting tin the grab the phisher folder path usinmy kali wsl
-<img width="576" height="226" alt="Screenshot 2026-08-17 172212" src="https://github.com/user-attachments/assets/d27bdfac-940f-4bb9-9a10-2d0ecc0f45a6" />
-after unzip the file 
-<img width="731" height="503" alt="Screenshot 2026-08-17 172531" src="https://github.com/user-attachments/assets/14b5fc36-330f-4baa-9bcb-70192a9207ef" />
+In this CyberDefenders lab, I analyzed a phishing kit that was made to steal MetaMask seed phrases. I used Kali Linux in WSL and basic command-line tools to review the files, find the phishing code, and identify how the stolen information was collected.
 
-ran ls and find and -type f
+## Challenge Details
 
-<img width="478" height="128" alt="Screenshot 2026-08-17 172613" src="https://github.com/user-attachments/assets/8897dddf-98e6-4d7e-a881-67eecb177a20" />
+| Field | Details |
+|---|---|
+| Platform | CyberDefenders |
+| Category | Phishing Analysis |
+| Status | Completed |
+| Lab | [GrabThePhisher](https://cyberdefenders.org/blueteam-ctf-challenges/grabthephisher/) |
 
-ran grep 
-<img width="1898" height="781" alt="Screenshot 2026-08-17 172928" src="https://github.com/user-attachments/assets/1acbe73a-1028-42f7-98e3-3cb1ccce87e3" />
+## Tools Used
 
+- Kali Linux through WSL
+- `find`
+- `grep`
+- `cat`
 
-<img width="679" height="68" alt="Screenshot 2026-08-17 171825" src="https://github.com/user-attachments/assets/81c7ad4f-6039-4ff8-b78b-3003f7b0aac0" />
+## Lab Setup
 
+I started by going to the GrabThePhisher folder in my Kali WSL environment.
 
-<img width="648" height="130" alt="Screenshot 2026-08-17 171935" src="https://github.com/user-attachments/assets/1aec1526-c94b-4cf5-a576-7158c205e142" />
+<img width="576" height="226" alt="Opening the GrabThePhisher folder in Kali WSL" src="https://github.com/user-attachments/assets/d27bdfac-940f-4bb9-9a10-2d0ecc0f45a6" />
 
-2nd flag
+After unzipping the lab files, I reviewed the phishing kit directory.
 
-<img width="1597" height="916" alt="Screenshot 2026-08-17 172023" src="https://github.com/user-attachments/assets/be1ddf4b-d88e-46bf-a7d4-0fe51923df3a" />
+<img width="731" height="503" alt="Extracted GrabThePhisher lab files" src="https://github.com/user-attachments/assets/14b5fc36-330f-4baa-9bcb-70192a9207ef" />
 
-3rd flag
+I used `find . -type f` to list the files inside the kit.
 
-<img width="862" height="420" alt="Screenshot 2026-08-17 173411" src="https://github.com/user-attachments/assets/9ced23f2-ff1c-4509-8b86-3cf909c5d0f3" />
+<img width="478" height="128" alt="Listing files in the phishing kit" src="https://github.com/user-attachments/assets/8897dddf-98e6-4d7e-a881-67eecb177a20" />
 
-4th flag 
-<img width="1271" height="73" alt="image" src="https://github.com/user-attachments/assets/c9d73d85-93b9-40c4-bc1d-92f914d000a2" />
+I then used `grep` to search the files for useful strings, including wallet names, logging, and Telegram information.
 
-5th flag
-<img width="825" height="97" alt="Screenshot 2026-08-17 174059" src="https://github.com/user-attachments/assets/064b8d20-070d-4448-911f-86842cf0a142" />
+<img width="1898" height="781" alt="Searching the phishing kit with grep" src="https://github.com/user-attachments/assets/1acbe73a-1028-42f7-98e3-3cb1ccce87e3" />
 
-6th flag
+## Questions and Findings
 
-<img width="822" height="104" alt="Screenshot 2026-08-17 174344" src="https://github.com/user-attachments/assets/c39399f2-efed-4f55-93fb-ef6918598385" />
+### Q1: Which wallet is used to ask for the seed phrase?
 
-7th flag
+**Answer:** `MetaMask`
 
-<img width="1291" height="92" alt="Screenshot 2026-08-17 174510" src="https://github.com/user-attachments/assets/70996d92-60a2-4d07-acf2-0bc1ae4eae53" />
+The kit contained a MetaMask page that asked the victim to enter an account recovery phrase. This showed that MetaMask users were the target.
 
-8th flah
+<img width="679" height="68" alt="MetaMask wallet files found in the phishing kit" src="https://github.com/user-attachments/assets/81c7ad4f-6039-4ff8-b78b-3003f7b0aac0" />
 
-<img width="1291" height="136" alt="Screenshot 2026-08-17 175015" src="https://github.com/user-attachments/assets/67018ccb-fc5f-4560-80af-d9bf99359640" />
+<img width="648" height="130" alt="MetaMask seed phrase field found in the kit" src="https://github.com/user-attachments/assets/1aec1526-c94b-4cf5-a576-7158c205e142" />
 
-9th flag
-rw
-<img width="1216" height="266" alt="Screenshot 2026-08-17 175342" src="https://github.com/user-attachments/assets/bf31979c-7e6a-4f43-aebd-152a6d95b8b4" />
+### Q2: Which file contains the phishing kit code?
 
-last flag
-<img width="129" height="55" alt="Screenshot 2026-08-17 175532" src="https://github.com/user-attachments/assets/a7a66a3e-7f41-43fd-878a-08c9b7ac9faa" />
+**Answer:** `metamask.php`
 
+The `metamask.php` file handled the submitted form data and contained the main phishing logic.
 
+<img width="1597" height="916" alt="Phishing code inside metamask.php" src="https://github.com/user-attachments/assets/be1ddf4b-d88e-46bf-a7d4-0fe51923df3a" />
 
+### Q3: Which language was the kit written in?
 
+**Answer:** `PHP`
 
+The `.php` extension and the server-side code confirmed that the kit was written in PHP.
 
+<img width="862" height="420" alt="PHP code found in the phishing kit" src="https://github.com/user-attachments/assets/9ced23f2-ff1c-4509-8b86-3cf909c5d0f3" />
+
+### Q4: Which service retrieves the victim's machine information?
+
+**Answer:** `Sypex Geo`
+
+The script sent the victim's IP address to Sypex Geo to collect location information such as the country, region, and city.
+
+<img width="1271" height="73" alt="Sypex Geo lookup found in the script" src="https://github.com/user-attachments/assets/c9d73d85-93b9-40c4-bc1d-92f914d000a2" />
+
+### Q5: How many seed phrases had already been collected?
+
+**Answer:** `3`
+
+The `log.txt` file contained three separate seed phrase entries.
+
+<img width="825" height="97" alt="Three seed phrase entries in log.txt" src="https://github.com/user-attachments/assets/064b8d20-070d-4448-911f-86842cf0a142" />
+
+### Q6: What was the most recent seed phrase?
+
+**Answer:** `father also ... hockey` *(redacted in the written answer)*
+
+The last entry in `log.txt` was the most recently collected phrase.
+
+<img width="822" height="104" alt="Most recent seed phrase in log.txt" src="https://github.com/user-attachments/assets/c39399f2-efed-4f55-93fb-ef6918598385" />
+
+### Q7: Which methods were used for credential dumping?
+
+**Answer:** Local logging in `log.txt` and exfiltration through `Telegram`
+
+The kit saved a local copy of the stolen data and also sent it to a Telegram bot. This gave the attacker a backup and real-time access to the results.
+
+<img width="1291" height="92" alt="Local logging and Telegram exfiltration code" src="https://github.com/user-attachments/assets/70996d92-60a2-4d07-acf2-0bc1ae4eae53" />
+
+### Q8: What is the Telegram bot token?
+
+**Answer:** `5457463144:...xm10` *(redacted in the written answer)*
+
+The token was hardcoded in the PHP script and used to authenticate the bot with the Telegram API.
+
+<img width="1291" height="136" alt="Telegram bot token in the phishing script" src="https://github.com/user-attachments/assets/67018ccb-fc5f-4560-80af-d9bf99359640" />
+
+### Q9: What is the phisher's Telegram chat ID?
+
+**Answer:** `5442785564`
+
+The chat ID told the bot where to send the stolen information.
+
+<img width="1216" height="266" alt="Telegram chat ID in the phishing script" src="https://github.com/user-attachments/assets/bf31979c-7e6a-4f43-aebd-152a6d95b8b4" />
+
+### Q10: What is the phishing kit developer's alias?
+
+**Answer:** `j1j1b1s@m3r0`
+
+The alias was included in the kit's code and may help connect it to other campaigns.
+
+<img width="129" height="55" alt="Developer alias found in the phishing kit" src="https://github.com/user-attachments/assets/a7a66a3e-7f41-43fd-878a-08c9b7ac9faa" />
+
+## Key Findings
+
+- The kit targeted MetaMask users and attempted to steal wallet recovery phrases.
+- Victim location data was collected through Sypex Geo.
+- Stolen data was stored in `log.txt` and sent to Telegram.
+
+## Lessons Learned
+
+- Simple commands such as `find` and `grep` can quickly uncover important evidence in a phishing kit.
+- Hardcoded API details can reveal how stolen data is exfiltrated and who may be connected to the campaign.
+
+Built and Documented by Aluseni Waritay
