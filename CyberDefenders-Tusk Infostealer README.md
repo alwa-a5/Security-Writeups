@@ -4,14 +4,6 @@
 
 This CyberDefenders lab focuses on the Tusk infostealer campaign targeting blockchain and cryptocurrency users. Threat intelligence connects the malicious file to fake websites, second-stage malware, command-and-control servers, and an attacker-controlled Ethereum wallet.
 
-## Challenge Details
-
-| Field | Details |
-|---|---|
-| Platform | CyberDefenders |
-| Category | Threat Intelligence and Malware Analysis |
-| Status | Completed |
-| Lab | [Tusk Infostealer](https://cyberdefenders.org/blueteam-ctf-challenges/tusk-infostealer/) |
 
 ## Tools Used
 
