@@ -23,7 +23,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q1: What is the size of the malicious file?
 
-**Thinking process:** The supplied hash matches a malicious 32-bit Windows DLL in Kaspersky's threat intelligence portal. Its file details show the size.
+The supplied MD5 hash can be used as a unique identifier for the malicious sample. A lookup in Kaspersky's threat intelligence portal matches it to a malicious 32-bit Windows DLL. The metadata page lists the exact file size as 921.36 KB.
 
 **Answer:** `921.36 KB`
 
@@ -31,7 +31,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q2: What word did the threat actor use for victims?
 
-**Thinking process:** The campaign report explains that the operators used a term from Russian cybercriminal slang that compares victims to animals hunted for their tusks.
+The campaign report explains the language used by the operators in their log messages. They referred to victims using a term from Russian cybercriminal slang that compares them to animals hunted for valuable tusks. This language also explains the name given to the Tusk campaign.
 
 **Answer:** `Mammoth`
 
@@ -39,7 +39,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q3: What malicious website copied peerme.io?
 
-**Thinking process:** The campaign report compares the legitimate PeerMe site with a look-alike domain used to deliver the malicious download.
+The legitimate service in this part of the campaign was `peerme.io`, a platform used to manage DAOs. The report shows a copied website with similar branding and a download button that delivered malware instead of the real application. The domain connected to that copied site was `tidyme.io`.
 
 **Answer:** `tidyme.io`
 
@@ -47,7 +47,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q4: Which cloud storage service hosted the malware?
 
-**Thinking process:** The download links for both Windows and macOS samples point to the same cloud storage provider.
+The campaign offered downloads for both Windows and macOS victims. Reviewing the download links shows that the payloads for both operating systems were stored on the same cloud storage service. Those links point to Dropbox.
 
 **Answer:** `Dropbox`
 
@@ -55,7 +55,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q5: What was the archive decompression password?
 
-**Thinking process:** The `config.json` file contains a hardcoded value used when extracting the downloaded archive.
+The malware's `config.json` file contains encoded download locations and a separate value used during archive extraction. The downloader passes that hardcoded value to the decompression routine after retrieving the second-stage payload. The value stored in the configuration is the archive password.
 
 **Answer:** `newfile2024`
 
@@ -63,7 +63,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q6: Which function retrieves the archive field?
 
-**Thinking process:** The function that reads the archive field also decodes the URL, downloads the file, and extracts its contents.
+The `preload.js` script contains the logic used to process the archive field from the configuration. One function reads and decodes the archive URL, downloads the protected file, extracts it with the configured password, and runs the included executables. The function name describes this complete process.
 
 **Answer:** `downloadAndExtractArchive`
 
@@ -71,7 +71,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q7: What were the legitimate and malicious AI translators?
 
-**Thinking process:** The report identifies the real AI translator and the copied domain used to distribute the malicious application.
+The third sub-campaign copied an existing AI translation service to make the malicious download appear trustworthy. Campaign research identifies YOUS.AI as the legitimate translator and shows that the attackers used `voico.io` for the imitation. The fake site distributed a malicious downloader while copying the idea and appearance of the real service.
 
 **Answer:** Legitimate: `YOUS.AI` | Malicious: `voico.io`
 
@@ -79,7 +79,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q8: What were the StealC C2 server IP addresses?
 
-**Thinking process:** The StealC network indicators list two IP addresses used for communication with infected systems.
+The campaign's network indicators separate the infrastructure used by the different malware families. Two IP addresses are specifically connected to StealC command-and-control activity. These servers allowed infected systems to send stolen information and receive further instructions.
 
 **Answer:** `46.8.238.240` and `23.94.225.177`
 
@@ -87,7 +87,7 @@ This CyberDefenders lab focuses on the Tusk infostealer campaign targeting block
 
 ### Q9: What Ethereum wallet was used in the campaign?
 
-**Thinking process:** The clipper configuration contains the replacement Ethereum address used when changing clipboard contents.
+The campaign included clipper malware that watched the clipboard for copied cryptocurrency addresses. When an Ethereum address was detected, the malware replaced it with an address controlled by the attacker. The replacement value found in the campaign data is the Ethereum wallet used by the operators.
 
 **Answer:** `0xaf0362e215Ff4e004F30e785e822F7E20b99723A`
 
